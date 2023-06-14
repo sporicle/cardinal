@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Configuration, OpenAIApi } from "openai";
 import './App.css';
+import ItemDisplay from './ItemDisplay';
 
 const configuration = new Configuration({
   apiKey: process.env.REACT_APP_OPENAI_KEY,
@@ -14,19 +15,53 @@ function App() {
   const [input3, setInput3] = useState('');
   const [inputB1, setInputB1] = useState('');
   const [inputB2, setInputB2] = useState('');
-  const [inputB3, setInputB3] = useState('');
   const [result, setResult] = useState('');
+  const [item, setItem] = useState({
+    stats: {
+      str: 50,
+      int: 30,
+      dex: 70,
+      luk: 70
+    },
+    imageUrl: 'https://oaidalleapiprodscus.blob.core.windows.net/private/org-KL167vRDR4p4y6paRrRHjfZi/user-zNpImCrHyEn2EWP9swoWU8qf/img-ah8BE6aVqbDrpvMtP0wzs5ZG.png?st=2023-06-14T08%3A42%3A42Z&se=2023-06-14T10%3A42%3A42Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-06-13T20%3A37%3A20Z&ske=2023-06-14T20%3A37%3A20Z&sks=b&skv=2021-08-06&sig=bt%2BJ4D2OHYzzAzpo4r3hR59CSINqNsPXkk/7rhRH1j0%3D',
+    name: 'Item Name',
+    description: 'Item Description',
+    effect: 'Item Effect'
+  });
 
   const generateQuest = async () => {
     try {
-      console.log(process.env.REACT_APP_OPENAI_KEY);
+      // console.log(generateQuestPrompt(input1,input2,input3));
 
       const completion = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt: "respond with hello world",
+        prompt: generateQuestPrompt(input1, input2, input3),
+        // prompt:"respond hi",
         temperature: 0.6,
+        max_tokens: 1000,
       });
       var result = completion.data.choices[0].text;
+      // var result =       `{
+      //   "quest_name": "The Lost Book",
+      //   "quest_difficulty": "Easy",
+      //   "quest_description": "A wizard has lost his spellbook. Find and return the spellbook to him.",
+      //   "quest_reward": {
+      //     "item": {
+      //       "name": "Arcane Tome",
+      //       "description": "A thick book filled with arcane symbols and magical formulae.",
+      //       "effect": "Increase spellcasting power by 10%",
+      //       "stats": {
+      //         "str": "0",
+      //         "dex": "0",
+      //         "luk": "0",
+      //         "int": "10"
+      //       }
+      //     },
+      //     "resource": {
+      //       "gold": "500"
+      //     }
+      //   }
+      // }`
       setResult(result);
     } catch (error) {
       // Consider adjusting the error handling logic for your use case
@@ -82,14 +117,33 @@ function App() {
         }
       }`
 
-      return "Generate a quest being given by a " + quest_giver + ". The setting of the world we are in is " + world_setting + ". The difficulty of the quest should be " + difficulty + ". Generate it in exactly the format of these example quests:"+example_quest+","+example_quest2;
+      return "Generate a quest being given by a " + quest_giver + ". The setting of the world we are in is " + world_setting + ". The difficulty of the quest should be " + difficulty + ". Generate it in exactly the format of these example quests:" + example_quest + "," + example_quest2 + " ";
     }
   };
 
-  const mintNFT = () => {
-    // Perform any action you want when the "generate" button is clicked
-    // Here, we'll just set the result state with a sample value
-    setResult('Generated result goes here');
+  const mintNFT = async () => {
+    const item_json = JSON.parse(inputB2);
+
+    // const response = await openai.createImage({
+    //   prompt: item_json.item.description+", pixel art, in a cute style, show only the item and nothing else",
+    //   n: 1,
+    //   size: "256x256",
+    // });
+    // var image_url = response.data.data[0].url;
+    var image_url = "https://oaidalleapiprodscus.blob.core.windows.net/private/org-KL167vRDR4p4y6paRrRHjfZi/user-zNpImCrHyEn2EWP9swoWU8qf/img-ah8BE6aVqbDrpvMtP0wzs5ZG.png?st=2023-06-14T08%3A42%3A42Z&se=2023-06-14T10%3A42%3A42Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-06-13T20%3A37%3A20Z&ske=2023-06-14T20%3A37%3A20Z&sks=b&skv=2021-08-06&sig=bt%2BJ4D2OHYzzAzpo4r3hR59CSINqNsPXkk/7rhRH1j0%3D"
+
+    setItem({
+      stats: {
+        str: parseInt(item_json.item.stats.str),
+        int: parseInt(item_json.item.stats.int),
+        dex: parseInt(item_json.item.stats.dex),
+        luk: parseInt(item_json.item.stats.luk)
+      },
+      imageUrl: image_url,
+      name: item_json.item.name,
+      description: item_json.item.description,
+      effect: item_json.item.effect
+    });
   };
 
   return (
@@ -108,7 +162,7 @@ function App() {
             </div>
             <div className="input-container">
               <label>Quest Giver:</label>
-              <input type="text" value={input2} onChange={(e) => setInput2(e.target.value)} />
+              <textarea className="input-textarea" type="text" value={input2} onChange={(e) => setInput2(e.target.value)} />
             </div>
             <div className="input-container">
               <label>Difficulty:</label>
@@ -123,25 +177,31 @@ function App() {
           </div>
           <div className={`view-content ${view === 2 ? 'active' : ''}`}>
             <div className="input-container">
-              <label>Text 1:</label>
-              <input type="text" value={inputB1} onChange={(e) => setInputB1(e.target.value)} />
+              <label>Target Wallet:</label>
+              <textarea className="input-textarea" type="text" value={inputB1} onChange={(e) => setInputB1(e.target.value)} />
             </div>
             <div className="input-container">
-              <label>Text 2:</label>
-              <input type="text" value={inputB2} onChange={(e) => setInputB2(e.target.value)} />
-            </div>
-            <div className="input-container">
-              <label>Text 3:</label>
-              <input type="text" value={inputB3} onChange={(e) => setInputB3(e.target.value)} />
+              <label>Item JSON:</label>
+              <textarea className="input-textarea" type="text" value={inputB2} onChange={(e) => setInputB2(e.target.value)} />
             </div>
             <button onClick={mintNFT}>Mint NFT</button>
           </div>
         </div>
       </div>
-
-      <div className="result-container">
-        <label>Result:</label>
-        <textarea className="result-textarea" value={result} readOnly />
+      <div className={`view-content ${view === 1 ? 'active' : ''}`}>
+        <div className="result-container">
+          <label>Result:</label>
+          <textarea className="result-textarea" value={result} readOnly />
+        </div>
+      </div>
+      <div className={`view-content ${view === 2 ? 'active' : ''}`}>
+        <ItemDisplay
+          stats={item.stats}
+          imageUrl={item.imageUrl}
+          name={item.name}
+          description={item.description}
+          effect={item.effect}
+        />
       </div>
     </div>
   );

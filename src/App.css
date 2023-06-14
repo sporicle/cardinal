@@ -45,6 +45,12 @@
   border: 1px solid #666;
 }
 
+.view-content2 {
+  display: none;
+  padding: 20px;
+  border: 1px solid #666;
+}
+
 .view-content.active {
   display: block;
 }
@@ -85,7 +91,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-left: 20px;
+  margin-left: 0px;
   padding-right: 15vh;
 }
 
@@ -102,9 +108,19 @@ button:hover {
 }
 
 .result-textarea {
-  width: 100%;
+  width: 450px;
   height: 450px; /* Adjust the height as needed */
   padding: 5px;
   white-space: pre-wrap;
   /* Add any additional styles for the result textarea */
+}
+
+.item-display {
+  margin-right: 100px;
+}
+
+.item-image {
+  width: 256px; /* Set the desired width */
+  height: 256px; /* Set the desired height */
+  object-fit: cover; /* Scale and crop the image to fit the specified dimensions */
 }
