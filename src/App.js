@@ -3,7 +3,7 @@ import { Configuration, OpenAIApi } from "openai";
 import './App.css';
 
 const configuration = new Configuration({
-  apiKey: "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",
+  apiKey: process.env.REACT_APP_OPENAI_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
@@ -19,6 +19,8 @@ function App() {
 
   const generateQuest = async () => {
     try {
+      console.log(process.env.REACT_APP_OPENAI_KEY);
+
       const completion = await openai.createCompletion({
         model: "text-davinci-003",
         prompt: "respond with hello world",
@@ -35,18 +37,53 @@ function App() {
       }
     }
 
-    // function generatePrompt(animal) {
-    //   const capitalizedAnimal =
-    //     animal[0].toUpperCase() + animal.slice(1).toLowerCase();
-    //   return `Suggest three names for an animal that is a superhero.
+    function generateQuestPrompt(world_setting, quest_giver, difficulty) {
+      var example_quest = `{
+        "quest_name": "Clear the Slimes",
+          "quest_difficulty": "Easy",
+            "quest_description": "A pack of slimes has been spotted on the east side of the island. Kill 20 of them and bring back the slime droplets.",
+              "quest_reward": {
+          "item": {
+            "name": "Slime Charm",
+              "description": "A small charm shaped in the form of a blue slime creature.",
+                "effect": "This charm increases exp gained from killing slimes by 10%",
+                  "stats": {
+              "str": "0",
+                "dex": "0",
+                  "luk": "0",
+                    "int": "0"
+            }
+          },
+          "resource": {
+            "gold": "500"
+          }
+        }
+      }`
 
-    // Animal: Cat
-    // Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-    // Animal: Dog
-    // Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-    // Animal: ${capitalizedAnimal}
-    // Names:`;
-    // }
+      var example_quest2 = `{
+        "quest_name": "Revenge of the Lich King",
+        "quest_difficulty": "Epic",
+        "quest_description": "The Lich King has raised his armies of undead skeletons. Defeat the skeleton guards and battle the lich king.",
+        "quest_reward": {
+          "item": {
+            "name": "Staff of the Lich King",
+            "description": "A staff imbued with dark energy. There is a skull at the top of the staff. You occasionally see souls escaping from the staff.",
+            "effect": "[Raise Undead] : When you battle, you summon two skeleton minions to join the fray.",
+            "stats": {
+              "str": "10",
+              "dex": "10",
+              "luk": "10",
+              "int": "30"
+            }
+          },
+          "resource": {
+            "gold": "10000"
+          }
+        }
+      }`
+
+      return "Generate a quest being given by a " + quest_giver + ". The setting of the world we are in is " + world_setting + ". The difficulty of the quest should be " + difficulty + ". Generate it in exactly the format of these example quests:"+example_quest+","+example_quest2;
+    }
   };
 
   const mintNFT = () => {
@@ -66,11 +103,11 @@ function App() {
         <div className="view">
           <div className={`view-content ${view === 1 ? 'active' : ''}`}>
             <div className="input-container">
-              <label>Setting:</label>
-              <input type="text" value={input1} onChange={(e) => setInput1(e.target.value)} />
+              <label>World Setting:</label>
+              <textarea className="input-textarea" type="text" value={input1} onChange={(e) => setInput1(e.target.value)} />
             </div>
             <div className="input-container">
-              <label>Background:</label>
+              <label>Quest Giver:</label>
               <input type="text" value={input2} onChange={(e) => setInput2(e.target.value)} />
             </div>
             <div className="input-container">
@@ -104,7 +141,7 @@ function App() {
 
       <div className="result-container">
         <label>Result:</label>
-        <textarea value={result} readOnly />
+        <textarea className="result-textarea" value={result} readOnly />
       </div>
     </div>
   );
