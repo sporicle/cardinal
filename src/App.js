@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
+import { Configuration, OpenAIApi } from "openai";
 import './App.css';
+
+const configuration = new Configuration({
+  apiKey: "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",
+});
+const openai = new OpenAIApi(configuration);
 
 function App() {
   const [view, setView] = useState(1);
@@ -11,10 +17,36 @@ function App() {
   const [inputB3, setInputB3] = useState('');
   const [result, setResult] = useState('');
 
-  const generateQuest = () => {
-    // Perform any action you want when the "generate" button is clicked
-    // Here, we'll just set the result state with a sample value
-    setResult('Generated result goes here');
+  const generateQuest = async () => {
+    try {
+      const completion = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: "respond with hello world",
+        temperature: 0.6,
+      });
+      var result = completion.data.choices[0].text;
+      setResult(result);
+    } catch (error) {
+      // Consider adjusting the error handling logic for your use case
+      if (error.response) {
+        console.error(error.response.status, error.response.data);
+      } else {
+        console.error(`Error with OpenAI API request: ${error.message}`);
+      }
+    }
+
+    // function generatePrompt(animal) {
+    //   const capitalizedAnimal =
+    //     animal[0].toUpperCase() + animal.slice(1).toLowerCase();
+    //   return `Suggest three names for an animal that is a superhero.
+
+    // Animal: Cat
+    // Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
+    // Animal: Dog
+    // Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
+    // Animal: ${capitalizedAnimal}
+    // Names:`;
+    // }
   };
 
   const mintNFT = () => {
@@ -44,11 +76,11 @@ function App() {
             <div className="input-container">
               <label>Difficulty:</label>
               <select value={input3} onChange={(e) => setInput3(e.target.value)}>
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                  <option value="epic">Epic</option>
-                </select>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="epic">Epic</option>
+              </select>
             </div>
             <button onClick={generateQuest}>Generate Quest</button>
           </div>
