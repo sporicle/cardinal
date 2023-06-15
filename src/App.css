@@ -15,6 +15,7 @@
   flex-direction: column;
   margin-right: 20px;
   padding-left: 5vh;
+  width: 180px;
 }
 
 .tab {
@@ -80,7 +81,7 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
-  
+  margin: 10px;
 }
 
 button:hover {
@@ -115,9 +116,9 @@ button:hover {
   /* Add any additional styles for the result textarea */
 }
 
-.item-display {
+/* .item-display {
   margin-right: 100px;
-}
+} */
 
 .item-image {
   width: 256px; /* Set the desired width */
