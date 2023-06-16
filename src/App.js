@@ -3,6 +3,9 @@ import { Configuration, OpenAIApi } from "openai";
 import './App.css';
 import ItemDisplay from './ItemDisplay';
 
+const fetch = require('node-fetch');
+const url = 'https://staging.crossmint.com/api/2022-06-09/collections/default/nfts';
+
 const configuration = new Configuration({
   apiKey: process.env.REACT_APP_OPENAI_KEY,
 });
@@ -218,7 +221,7 @@ function App() {
     const item_json = JSON.parse(result).quest_reward;
 
     const response = await openai.createImage({
-      prompt: item_json.item.description+", pixel art, in a cute style, show only the item and nothing else",
+      prompt: item_json.item.description + ", pixel art, in a cute style, show only the item and nothing else",
       n: 1,
       size: "256x256",
     });
@@ -239,7 +242,36 @@ function App() {
   };
 
   const mintNFT = async () => {
-    //mint 
+    //mint
+    const item_json = JSON.parse(result).quest_reward;
+
+    const options = {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-client-secret': 'sk_test.0ukqkSQy.Rd1CIq9uSChQqoeVg2BD2VroUg5SwQjk',
+        'x-project-id': '1e53e134-5089-43b5-a811-b73781d1e4cb'
+      },
+      body: JSON.stringify({
+        recipient: 'solana:' + inputB1, // FWMkWWVvSz7cVkhovkVHL59TDPtX78X23bA4frTbjkCA
+        metadata: {
+          name: item_json.item.name,
+          image: item.imageUrl,
+          description: item_json.item.description + " " + item_json.item.effect,
+          attributes: [
+            { trait_type: 'str', value: item_json.item.stats.str },
+            { trait_type: 'int', value: item_json.item.stats.int },
+            { trait_type: 'dex', value: item_json.item.stats.dex },
+            { trait_type: 'luk', value: item_json.item.stats.luk },]
+        }
+      })
+    };
+
+    fetch(url, options)
+      .then(res => res.json())
+      .then(json => console.log(json))
+      .catch(err => console.error('error:' + err));
   };
 
 
@@ -290,7 +322,7 @@ function App() {
           <div className={`view-content ${view === 3 ? 'active' : ''}`}>
             <button onClick={generateGamePrompt}>Generate Prompt</button>
           </div>
-          
+
         </div>
       </div>
       <div className={`view-content ${view === 1 ? 'active' : ''}`}>
@@ -315,7 +347,7 @@ function App() {
         </div>
         <button onClick={handleCopyClick}>Copy</button>
       </div>
-      
+
     </div>
   );
 }
